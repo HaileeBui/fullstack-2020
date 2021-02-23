@@ -4,12 +4,13 @@ import './index.css';
 
 const App = (props) => {
   const [selected, setSelected] = useState(0);
-
-
+  const max = copy.reduce((a,b) => Math.max(a,b));
+  
   return (
     <div>
       <button onClick={() => {
         setSelected(Math.floor(Math.random() * 5))
+        console.log(max)
       }}>Next</button>
       <button onClick={() => {
         copy[selected] += 1;
@@ -19,6 +20,8 @@ const App = (props) => {
       <p>{props.anecdotes[selected]}</p>
       <p>has {copy[selected]} votes</p>
       <h1>Anecdote with most votes</h1>
+      <p>{props.anecdotes[copy.indexOf(max)]}</p>
+      <p>has {copy[copy.indexOf(max)]} votes</p>
     </div>
   )
 }
