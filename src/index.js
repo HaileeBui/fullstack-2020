@@ -31,14 +31,26 @@ const Statistics = (props) => {
   }
 
   return (
-    <div>
-      <Statistic text='good' value={props.good}/>
-      <Statistic text='neutral' value={props.neutral} />
-      <Statistic text='bad' value={props.bad} />
-      <Statistic text='all' value={all()} />
-      <Statistic text='average' value={average()} />
-      <Statistic text='positive' value={positive()} />
-    </div>
+    <table>
+      <tbody>
+      <td>
+        <tr>good</tr>
+        <tr>neutral</tr>
+        <tr>bad</tr>
+        <tr>all</tr>
+        <tr>average</tr>
+        <tr>positive</tr>
+      </td>
+      <td>
+        <tr>{props.good}</tr>
+        <tr>{props.neutral}</tr>
+        <tr>{props.bad}</tr>
+        <tr>{all()}</tr>
+        <tr>{average()}</tr>
+        <tr>{positive()}</tr>
+      </td>
+      </tbody>
+    </table>
   )
 }
 
@@ -55,7 +67,7 @@ const App = () => {
   return (
     <div style={{ margin: 10 }}>
       <h1>give feedback</h1>
-      <div>
+      <div style={{display:'flex', flexDirection: 'horizontal'}}>
         <Button onClick={pressGood} text='good' />
         <Button onClick={pressNeutral} text='neutral' />
         <Button onClick={pressBad} text='bad' />
