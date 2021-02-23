@@ -3,15 +3,27 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 const App = (props) => {
-  const [selected, setSelected] = useState(0)
+  const [selected, setSelected] = useState(0);
+
 
   return (
     <div>
-      <button onClick={() => setSelected(Math.floor(Math.random()*Math.floor(5)))}>Next</button>
+      <button onClick={() => {
+        setSelected(Math.floor(Math.random() * 5))
+      }}>Next</button>
+      <button onClick={() => {
+        copy[selected] += 1;
+        console.log(copy,  );
+      }}>
+        Vote</button>
       <p>{props.anecdotes[selected]}</p>
+      <p>has {copy[selected]} votes</p>
+      <h1>Anecdote with most votes</h1>
     </div>
   )
 }
+const points = Array.apply(null, new Array(6)).map(Number.prototype.valueOf, 0);
+const copy = [...points];
 
 const anecdotes = [
   'If it hurts, do it more often',
@@ -22,6 +34,6 @@ const anecdotes = [
   'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
 ]
 ReactDOM.render(
-  <App anecdotes={anecdotes} />,
+  <App anecdotes={anecdotes}/>,
   document.getElementById('root')
 )
