@@ -1,42 +1,73 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-const App = (props) => {
-  const [selected, setSelected] = useState(0);
-  const max = copy.reduce((a,b) => Math.max(a,b));
-  
+const Header = ({ course }) => {
+  return (
+    <h1>{course.name}</h1>
+  )
+}
+
+const Total = ({ course }) => {
+  const sum = course.parts[0].exercises + course.parts[1].exercises + course.parts[2].exercises
+  return(
+    <p>Number of exercises {sum}</p>
+  ) 
+}
+
+const Part = (props) => {
+  return (
+    <p>
+      {props.part.name} {props.part.exercises}
+    </p>    
+  )
+}
+
+const Content = ({ course }) => {
   return (
     <div>
-      <button onClick={() => {
-        setSelected(Math.floor(Math.random() * 5))
-        console.log(max)
-      }}>Next</button>
-      <button onClick={() => {
-        copy[selected] += 1;
-        console.log(copy,  );
-      }}>
-        Vote</button>
-      <p>{props.anecdotes[selected]}</p>
-      <p>has {copy[selected]} votes</p>
-      <h1>Anecdote with most votes</h1>
-      <p>{props.anecdotes[copy.indexOf(max)]}</p>
-      <p>has {copy[copy.indexOf(max)]} votes</p>
+      <Part part={course.parts[0]} />
+      <Part part={course.parts[1]} />
+      <Part part={course.parts[2]} />
     </div>
   )
 }
-const points = Array.apply(null, new Array(6)).map(Number.prototype.valueOf, 0);
-const copy = [...points];
 
-const anecdotes = [
-  'If it hurts, do it more often',
-  'Adding manpower to a late software project makes it later!',
-  'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
-  'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
-  'Premature optimization is the root of all evil.',
-  'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
-]
+const Course = ({course}) => {
+  return(
+    <div>
+      <Header course={course} />
+      <Content course={course} />
+    </div>
+  )
+}
+
+const App = () => {
+  const course = {
+    id: 1,
+    name: 'Half Stack application development',
+    parts: [
+      {
+        name: 'Fundamentals of React',
+        exercises: 10,
+        id: 1
+      },
+      {
+        name: 'Using props to pass data',
+        exercises: 7,
+        id: 2
+      },
+      {
+        name: 'State of a component',
+        exercises: 14,
+        id: 3
+      }
+    ]
+  }
+
+  return <Course course={course} />
+}
 ReactDOM.render(
-  <App anecdotes={anecdotes}/>,
+  <App/>,
   document.getElementById('root')
 )
