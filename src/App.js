@@ -1,4 +1,37 @@
 import React, { useState } from 'react'
+const Filter = ({ newFilter, handleFilter }) => {
+    return (
+        <div>
+            filter shown with: <input value={newFilter} onChange={handleFilter} />
+        </div>
+    )
+}
+
+const PersonForm = (props) => {
+    return (
+        <form onSubmit={props.addContact}>
+            <div>
+                name: <input value={props.newName} onChange={props.handleNameChanged} />
+            </div>
+            <div>number: <input value={props.newNumber} onChange={props.handleNumberChanged} />
+            </div>
+
+            <div>
+                <button type="submit">add</button>
+            </div>
+        </form>
+    )
+}
+
+const Persons = ({list}) => {
+    return (
+        <ul>
+            {list.map(item =>
+                <li key={list.indexOf(item)}>{item.name} {item.number}</li>
+            )}
+        </ul>
+    )
+}
 
 const App = () => {
     const [persons, setPersons] = useState([
@@ -47,38 +80,22 @@ const App = () => {
 
     const handleFilter = event => {
         console.log("event.target.value");
-        setNewFilter(event.target.value);        
+        setNewFilter(event.target.value);
     }
 
-    const filteredList = () => 
+    const filteredList = () =>
         newFilter.length > 0 ? persons.filter(person => person.name.toLocaleLowerCase().includes(newFilter)) : persons
-    
+
 
     return (
         <div>
             <h2>Phonebook</h2>
-            <div>
-                filter shown with: <input value={newFilter} onChange={handleFilter} />
-            </div>
+            <Filter newFilter={newFilter} handleFilter={handleFilter} />
             <h2>add new</h2>
-
-            <form onSubmit={addContact}>
-                <div>
-                    name: <input value={newName} onChange={handleNameChanged} />
-                </div>
-                <div>number: <input value={newNumber} onChange={handleNumberChanged} />
-                </div>
-
-                <div>
-                    <button type="submit">add</button>
-                </div>
-            </form>
+            <PersonForm  addContact={addContact} newName={newName} newNumber={newNumber}
+             handleNameChanged={handleNameChanged} handleNumberChanged={handleNumberChanged}/>
             <h2>Numbers</h2>
-            <ul>
-                {filteredList().map(item =>
-                    <li key={filteredList().indexOf(item)}>{item.name} {item.number}</li>
-                )}
-            </ul>
+            <Persons list={filteredList()} />
         </div>
     )
 }
