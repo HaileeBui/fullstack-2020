@@ -27,12 +27,12 @@ const PersonForm = (props) => {
     )
 }
 
-const Persons = ({list, removeClick}) => {
-    const removePerson = (e,id) => {
+const Persons = ({ list, removeClick }) => {
+    const removePerson = (e, id) => {
         e.preventDefault();
-        if(removeClick) {
+        if (removeClick) {
             const willDelete = window.confirm(`Delete?`);
-            if(willDelete){
+            if (willDelete) {
                 removeClick(id)
             }
         }
@@ -42,7 +42,7 @@ const Persons = ({list, removeClick}) => {
             {list.map(item =>
                 <li key={list.indexOf(item)}>
                     {item.name} {item.number}
-                    <button onClick={e => removePerson(e,item.id) }>delete</button> </li>
+                    <button onClick={e => removePerson(e, item.id)}>delete</button> </li>
             )}
         </ul>
     )
@@ -55,10 +55,10 @@ const App = () => {
     const [newFilter, setNewFilter] = useState('')
 
     React.useEffect(() => {
-        contactService.getAll().then(response => setPersons(response)) ;
+        contactService.getAll().then(response => setPersons(response));
         console.log(persons);
-      }, [])
-    
+    }, [])
+
     const addContact = event => {
         event.preventDefault();
         var found = false;
@@ -70,24 +70,40 @@ const App = () => {
         }
 
         if (found) {
-            setNewName('');
-            setNewNumber('');
-            window.alert(`${ newName } is already added to phonebook`);
-            console.log('else', persons);
-        } else {            
+            const foundPerson = persons.find(n => n.name === newName);
+            const willUpdate = window.confirm(
+                `${ foundPerson.name } is alrady added to the phonebook, ` +
+                "replace the old number with a new one?"
+            );
+            if (willUpdate) {
+                const updatedPerson = { ...foundPerson, number: newNumber };
+                contactService
+                    .updatePerson(foundPerson.id, updatedPerson)
+                    .then(returnedPerson => {
+                        setPersons(persons.map(person => person.id !== foundPerson.id ? person : returnedPerson))
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    });
+                setPersons(persons.filter((p) => p.id !== foundPerson.id));
+
+                setNewName('');
+                setNewNumber('');
+            }
+        } else {
             const contactObject = {
                 name: newName,
                 number: newNumber,
-                id: persons.length +1, 
+                id: persons.length + 1,
             }
             contactService
-            .addPerson(contactObject)
-            .then(returnedPerson => {
-                setPersons(persons.concat(returnedPerson))
-            })
-            .catch(error => {
-                console.log(error);
-            })
+                .addPerson(contactObject)
+                .then(returnedPerson => {
+                    setPersons(persons.concat(returnedPerson))
+                })
+                .catch(error => {
+                    console.log(error);
+                })
             setNewName("");
             setNewNumber("");
         }
@@ -96,19 +112,19 @@ const App = () => {
 
     const remove = (id) => {
         let deleted = true;
-    
+
         contactService
-          .removePerson(id)
-          .catch((err) => {
-            console.log(err);
-            deleted = false;
-          })
-          .finally(() => {
-            if (deleted) {
-              setPersons(persons.filter((p) => p.id !== id));
-            }
-          });
-      };
+            .removePerson(id)
+            .catch((err) => {
+                console.log(err);
+                deleted = false;
+            })
+            .finally(() => {
+                if (deleted) {
+                    setPersons(persons.filter((p) => p.id !== id));
+                }
+            });
+    };
 
     const handleNameChanged = event => {
         console.log("event.target.value");
@@ -133,8 +149,8 @@ const App = () => {
             <h2>Phonebook</h2>
             <Filter newFilter={newFilter} handleFilter={handleFilter} />
             <h2>add new</h2>
-            <PersonForm  addContact={addContact} newName={newName} newNumber={newNumber}
-             handleNameChanged={handleNameChanged} handleNumberChanged={handleNumberChanged}/>
+            <PersonForm addContact={addContact} newName={newName} newNumber={newNumber}
+                handleNameChanged={handleNameChanged} handleNumberChanged={handleNumberChanged} />
             <h2>Numbers</h2>
             <Persons list={filteredList()} removeClick={remove} />
         </div>
