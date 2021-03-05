@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import contactService from "./services/person";
+
 
 const Filter = ({ newFilter, handleFilter }) => {
     return (
@@ -25,11 +27,22 @@ const PersonForm = (props) => {
     )
 }
 
-const Persons = ({list}) => {
+const Persons = ({list, removeClick}) => {
+    const removePerson = (e,id) => {
+        e.preventDefault();
+        if(removeClick) {
+            const willDelete = window.confirm(`Delete?`);
+            if(willDelete){
+                removeClick(id)
+            }
+        }
+    }
     return (
         <ul>
             {list.map(item =>
-                <li key={list.indexOf(item)}>{item.name} {item.number}</li>
+                <li key={list.indexOf(item)}>
+                    {item.name} {item.number}
+                    <button onClick={e => removePerson(e,item.id) }>delete</button> </li>
             )}
         </ul>
     )
@@ -42,16 +55,12 @@ const App = () => {
     const [newFilter, setNewFilter] = useState('')
 
     React.useEffect(() => {
-        console.log('effect')
-        axios
-          .get('http://localhost:3001/persons')
-          .then(response => {
-            setPersons(response.data)
-          })
+        contactService.getAll().then(response => setPersons(response)) ;
+        console.log(persons);
       }, [])
+    
     const addContact = event => {
         event.preventDefault();
-        console.log("button clicked", event.target);
         var found = false;
         for (var i = 0; i < persons.length; i++) {
             if (persons[i].name === newName) {
@@ -65,13 +74,41 @@ const App = () => {
             setNewNumber('');
             window.alert(`${ newName } is already added to phonebook`);
             console.log('else', persons);
-        } else {
-            setPersons(persons.concat({ name: newName, number: newNumber }));
-            console.log('line23', persons);
-            setNewName('');
+        } else {            
+            const contactObject = {
+                name: newName,
+                number: newNumber,
+                id: persons.length +1, 
+            }
+            contactService
+            .addPerson(contactObject)
+            .then(returnedPerson => {
+                setPersons(persons.concat(returnedPerson))
+            })
+            .catch(error => {
+                console.log(error);
+            })
+            setNewName("");
+            setNewNumber("");
         }
-
     }
+
+
+    const remove = (id) => {
+        let deleted = true;
+    
+        contactService
+          .removePerson(id)
+          .catch((err) => {
+            console.log(err);
+            deleted = false;
+          })
+          .finally(() => {
+            if (deleted) {
+              setPersons(persons.filter((p) => p.id !== id));
+            }
+          });
+      };
 
     const handleNameChanged = event => {
         console.log("event.target.value");
@@ -99,7 +136,7 @@ const App = () => {
             <PersonForm  addContact={addContact} newName={newName} newNumber={newNumber}
              handleNameChanged={handleNameChanged} handleNumberChanged={handleNumberChanged}/>
             <h2>Numbers</h2>
-            <Persons list={filteredList()} />
+            <Persons list={filteredList()} removeClick={remove} />
         </div>
     )
 }
