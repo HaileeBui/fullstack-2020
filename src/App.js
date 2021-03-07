@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import contactService from "./services/person";
 
+const Notification = ({ message, messType }) => {
+    if (message === null) {
+        return null
+    }
+
+
+    return (
+        <div className={messType}>
+            {message}
+        </div>
+    )
+}
 
 const Filter = ({ newFilter, handleFilter }) => {
     return (
@@ -49,10 +60,12 @@ const Persons = ({ list, removeClick }) => {
 }
 
 const App = () => {
-    const [persons, setPersons] = useState([])
-    const [newName, setNewName] = useState('')
-    const [newNumber, setNewNumber] = useState('')
-    const [newFilter, setNewFilter] = useState('')
+    const [persons, setPersons] = useState([]);
+    const [newName, setNewName] = useState('');
+    const [newNumber, setNewNumber] = useState('');
+    const [newFilter, setNewFilter] = useState('');
+    const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState('');
 
     React.useEffect(() => {
         contactService.getAll().then(response => setPersons(response));
@@ -86,7 +99,12 @@ const App = () => {
                         console.log(error)
                     });
                 setPersons(persons.filter((p) => p.id !== foundPerson.id));
-
+                setMessage("Info updated");
+                setMessageType('confirmation')
+                setTimeout(() => {
+                    setMessage(null)
+                    setMessageType(null)
+                }, 2000)
                 setNewName('');
                 setNewNumber('');
             }
@@ -104,6 +122,12 @@ const App = () => {
                 .catch(error => {
                     console.log(error);
                 })
+            setMessage("Contact added");
+            setMessageType('confirmation')
+            setTimeout(() => {
+                setMessage(null)
+                setMessageType(null)
+            }, 2000)
             setNewName("");
             setNewNumber("");
         }
@@ -122,6 +146,12 @@ const App = () => {
             .finally(() => {
                 if (deleted) {
                     setPersons(persons.filter((p) => p.id !== id));
+                    setMessage('Contact deleted');
+                    setMessageType('error')
+                    setTimeout(() => {
+                        setMessage(null)
+                        setMessageType('error')
+                      }, 2000)
                 }
             });
     };
@@ -147,6 +177,7 @@ const App = () => {
     return (
         <div>
             <h2>Phonebook</h2>
+            <Notification message={message} messType={messageType}/>
             <Filter newFilter={newFilter} handleFilter={handleFilter} />
             <h2>add new</h2>
             <PersonForm addContact={addContact} newName={newName} newNumber={newNumber}
